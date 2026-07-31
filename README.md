@@ -65,13 +65,21 @@ Activate the virtual environment:
   ```
 
 ### 3. Install Dependencies
-Ensure pip is updated and install the required libraries:
-```powershell
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
+Ensure pip is updated and install the required libraries. 
 
-*Note: PyAudio may require building tools on some platforms if a wheel is not available. Ensure you have the Microsoft C++ Build Tools installed if you encounter errors compiling PyAudio.*
+*   For **local execution** (with local desktop app GUI, PyAudio microphone capture, and OpenCV webcam support):
+    ```powershell
+    python -m pip install --upgrade pip
+    pip install -r requirements-local.txt
+    ```
+
+*   For **cloud/server deployment** (such as Streamlit Community Cloud, which uses browser-based inputs instead of local OS devices):
+    ```powershell
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+    ```
+
+*Note: On Windows, `PyAudio` may require compiling tools. Ensure you have the Microsoft C++ Build Tools installed if you encounter compiler errors.*
 
 ### 4. Configure Environment Variables
 Copy the template `.env.example` to `.env`:

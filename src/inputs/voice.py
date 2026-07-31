@@ -86,6 +86,38 @@ class VoiceInputHandler:
             logger.error(f"Error recording audio: {e}")
             return None
 
+    def transcribe_audio_bytes(self, audio_bytes: bytes, mime_type: str = 'audio/wav') -> str:
+        """
+        Transcribes raw audio bytes using the Gemini API.
+
+        Args:
+            audio_bytes: The raw audio bytes to transcribe.
+            mime_type: The MIME type of the audio data (e.g. 'audio/wav', 'audio/mp3').
+
+        Returns:
+            The transcribed text string, or a mock fallback string if transcription fails.
+        """
+        if genai is not None and types is not None and settings.gemini_api_key:
+            try:
+                logger.info(f"Transcribing audio bytes ({len(audio_bytes)} bytes, {mime_type}) using Gemini API...")
+                client = genai.Client(api_key=settings.gemini_api_key)
+                response = client.models.generate_content(
+                    model=settings.gemini_model_name,
+                    contents=[
+                        types.Part.from_bytes(data=audio_bytes, mime_type=mime_type),
+                        "Transcribe the spoken audio. Provide only the transcription, without any extra text."
+                    ]
+                )
+                transcription: str = response.text.strip()
+                if transcription:
+                    logger.info(f"Successfully transcribed audio: '{transcription}'")
+                    return transcription
+            except Exception as e:
+                logger.error(f"Error during audio transcription: {e}")
+
+        logger.info("Defaulting to mock voice transcription.")
+        return "Write a story about a little bunny who wants to visit the moon."
+
     def record_and_transcribe(self, duration_seconds: int = 5) -> str:
         """
         Records audio from microphone stream and transcribes it using the Gemini API.
@@ -101,28 +133,6 @@ class VoiceInputHandler:
             logger.warning("No audio recorded. Defaulting to mock voice transcription.")
             return "Write a story about a little bunny who wants to visit the moon."
 
-        # Transcribe audio using Gemini 2.5 Flash if key is configured
-        if genai is not None and types is not None and settings.gemini_api_key:
-            try:
-                logger.info(f"Transcribing audio file {wav_path} using Gemini API...")
-                client = genai.Client(api_key=settings.gemini_api_key)
-                
-                # Reading bytes directly from the Path object
-                audio_bytes: bytes = wav_path.read_bytes()
-
-                response = client.models.generate_content(
-                    model=settings.gemini_model_name,
-                    contents=[
-                        types.Part.from_bytes(data=audio_bytes, mime_type='audio/wav'),
-                        "Transcribe the spoken audio. Provide only the transcription, without any extra text."
-                    ]
-                )
-                transcription: str = response.text.strip()
-                if transcription:
-                    logger.info(f"Successfully transcribed audio: '{transcription}'")
-                    return transcription
-            except Exception as e:
-                logger.error(f"Error during audio transcription: {e}")
-
-        logger.info("Defaulting to mock voice transcription.")
-        return "Write a story about a little bunny who wants to visit the moon."
+        # Reading bytes directly from the Path object
+        audio_bytes: bytes = wav_path.read_bytes()
+        return self.transcribe_audio_bytes(audio_bytes, mime_type='audio/wav')
