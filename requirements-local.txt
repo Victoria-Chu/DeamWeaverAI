@@ -1,0 +1,12 @@
+# Inherit base cloud dependencies
+-r requirements.txt
+
+# Local hardware & GUI dependencies
+opencv-python>=4.8.0.0
+pyaudio>=0.2.14
+customtkinter>=5.2.2
+pygame>=2.0.0
+
+# Development & Testing tools
+pytest>=7.4.0
+ruff>=0.1.0

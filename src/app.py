@@ -41,6 +41,16 @@ def main() -> None:
     st.write(f"### Let's create a story for **{child_name}**!")
     topic: str = st.text_input("Base Story Idea", placeholder="e.g. A friendly little panda that wanted to explore the stars...")
 
+    pre_captured_image_bytes: bytes | None = None
+    uploaded_audio = None
+
+    if "Image" in input_mode:
+        camera_image = st.camera_input("Take a photo of your toy to spark the story!")
+        if camera_image is not None:
+            pre_captured_image_bytes = camera_image.getvalue()
+    else:
+        uploaded_audio = st.file_uploader("Upload a recorded voice spark (.wav or .mp3)", type=["wav", "mp3"])
+
     if st.button("Create My Storybook", type="primary"):
         if not topic.strip():
             st.warning("Please specify a story topic to spark our narrative.")
@@ -54,8 +64,24 @@ def main() -> None:
             mode="Image" if "Image" in input_mode else "Voice"
         )
 
+        pre_captured_transcript: str | None = None
+        if "Voice" in input_mode and uploaded_audio is not None:
+            st.info("Transcribing voice upload...")
+            mime_type: str = uploaded_audio.type or "audio/wav"
+            pre_captured_transcript = orchestrator.voice_handler.transcribe_audio_bytes(
+                uploaded_audio.getvalue(),
+                mime_type=mime_type
+            )
+            st.info(f"Speech Transcribed: \"{pre_captured_transcript}\"")
+
         # Run async orchestrator pipeline
-        result: dict[str, Any] = asyncio.run(orchestrator.run_pipeline(topic, enable_audio=enable_audio, enable_images=enable_images))
+        result: dict[str, Any] = asyncio.run(orchestrator.run_pipeline(
+            topic, 
+            enable_audio=enable_audio, 
+            enable_images=enable_images,
+            pre_captured_image_bytes=pre_captured_image_bytes,
+            pre_captured_transcript=pre_captured_transcript
+        ))
         story_json: dict[str, Any] = result["story"]
 
         st.success(f"✨ Storybook Generated: {story_json['title']} ✨")

@@ -1,5 +1,6 @@
 import asyncio
 import unittest
+from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -25,8 +26,20 @@ class TestBedtimeStoryOrchestrator(unittest.TestCase):
         self.assertEqual(self.orchestrator.child_age, 6)
         self.assertEqual(self.orchestrator.duration_minutes, 10)
 
-    def test_pipeline_execution_fallback(self) -> None:
+    @patch('src.core.orchestrator.TTSSynthesizer.synthesize_speech_async')
+    @patch('src.core.orchestrator.ImageGenerator.generate_illustrations_parallel')
+    @patch('src.core.orchestrator.VoiceInputHandler.record_and_transcribe')
+    def test_pipeline_execution_fallback(
+        self, 
+        mock_record: MagicMock, 
+        mock_gen_images: MagicMock, 
+        mock_tts: MagicMock
+    ) -> None:
         """Tests that the pipeline returns fallback story details when the Gemini API is unconfigured."""
+        mock_record.return_value = "A magical panda flying to outer space"
+        mock_gen_images.return_value = [Path("mock_cover.png"), Path("mock_scene1.png"), Path("mock_scene2.png"), Path("mock_scene3.png")]
+        mock_tts.return_value = Path("mock_audio.mp3")
+
         result: dict[str, Any] = asyncio.run(
             self.orchestrator.run_pipeline("A magical panda flying to outer space")
         )
@@ -39,10 +52,24 @@ class TestBedtimeStoryOrchestrator(unittest.TestCase):
         self.assertEqual(story["metadata"]["target_duration_minutes"], 10)
         self.assertEqual(story["metadata"]["total_word_count"], 1400)
 
+    @patch('src.core.orchestrator.TTSSynthesizer.synthesize_speech_async')
+    @patch('src.core.orchestrator.ImageGenerator.generate_illustrations_parallel')
+    @patch('src.core.orchestrator.VoiceInputHandler.record_and_transcribe')
     @patch('src.core.orchestrator.types')
     @patch('src.core.orchestrator.genai')
-    def test_pipeline_execution_with_gemini_api(self, mock_genai: MagicMock, mock_types: MagicMock) -> None:
+    def test_pipeline_execution_with_gemini_api(
+        self, 
+        mock_genai: MagicMock, 
+        mock_types: MagicMock,
+        mock_record: MagicMock,
+        mock_gen_images: MagicMock,
+        mock_tts: MagicMock
+    ) -> None:
         """Tests pipeline orchestration logic when calling mock Gemini Client API."""
+        mock_record.return_value = "A magical panda flying to outer space"
+        mock_gen_images.return_value = [Path("mock_cover.png"), Path("mock_scene1.png"), Path("mock_scene2.png"), Path("mock_scene3.png")]
+        mock_tts.return_value = Path("mock_audio.mp3")
+
         # Set up mock client response
         mock_client = MagicMock()
         mock_genai.Client.return_value = mock_client
