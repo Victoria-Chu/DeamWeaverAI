@@ -1,0 +1,6 @@
+# Ruff configuration for DreamWeaver AI
+[lint]
+ignore = [
+    "BLE001",  # Do not catch blind exception `Exception` (needed for safe run-time fallbacks)
+    "S110",    # `try`-`except`-`pass` detected (needed for safe empty file fallback)
+]

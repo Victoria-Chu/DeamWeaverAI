@@ -1,0 +1,32 @@
+# Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python Cache & Build Artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+*.egg-info/
+
+# Configuration and Environment Secrets
+.env
+.env.local
+.env.shared
+*.key
+
+# Generated runtime assets / media files
+assets/*.mp3
+assets/*.png
+assets/*.wav
+assets/*.jpg
+assets/illustration_*.png
+assets/narration.mp3
+dreamweaver_voice.wav
