@@ -6,7 +6,7 @@ Every evening, parents face a common challenge: keeping bedtime stories fresh, e
 
 **DreamWeaver AI** bridges the gap. It is a local Windows application that captures multimodal inputs (webcam image + microphone speech), processes them using the Google Gemini API, and outputs a personalized, time-calibrated audio storybook (1 cover image, 3 scene illustrations, and TTS audio narration) for children.
 
-For tech architecture details, see [tech_readme.md](file:///d:/gitfolder/DreamWeaverAI/tech_readme.md).
+For tech architecture details, see [ARCHITECTURE.md](file:///d:/gitfolder/DreamWeaverAI/ARCHITECTURE.md).
 
 ---
 
