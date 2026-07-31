@@ -2,6 +2,8 @@
 
 > **Turning children’s toys, names, and imagination into personalized, interactive bedtime adventures.**
 
+![DreamWeaver AI Application Interface](assets/interface_demo.png)
+
 Every evening, parents face a common challenge: keeping bedtime stories fresh, engaging, and aligned with their children's rapidly changing interests. At the same time, children have incredible, fleeting bursts of imagination—pointing at a toy panda, mentioning a spaceship, or wanting to be the hero of their own space race. 
 
 **DreamWeaver AI** bridges the gap. It is a local Windows application that captures multimodal inputs (webcam image + microphone speech), processes them using the Google Gemini API, and outputs a personalized, time-calibrated audio storybook (1 cover image, 3 scene illustrations, and TTS audio narration) for children.
