@@ -42,6 +42,7 @@ def main() -> None:
     topic: str = st.text_input("Base Story Idea", placeholder="e.g. A friendly little panda that wanted to explore the stars...")
 
     pre_captured_image_bytes: bytes | None = None
+    recorded_audio = None
     uploaded_audio = None
 
     if "Image" in input_mode:
@@ -49,7 +50,8 @@ def main() -> None:
         if camera_image is not None:
             pre_captured_image_bytes = camera_image.getvalue()
     else:
-        uploaded_audio = st.file_uploader("Upload a recorded voice spark (.wav or .mp3)", type=["wav", "mp3"])
+        recorded_audio = st.audio_input("Record a voice spark using your microphone!")
+        uploaded_audio = st.file_uploader("Or upload an existing voice recording (.wav or .mp3)", type=["wav", "mp3"])
 
     if st.button("Create My Storybook", type="primary"):
         if not topic.strip():
@@ -65,11 +67,12 @@ def main() -> None:
         )
 
         pre_captured_transcript: str | None = None
-        if "Voice" in input_mode and uploaded_audio is not None:
-            st.info("Transcribing voice upload...")
-            mime_type: str = uploaded_audio.type or "audio/wav"
+        audio_source = recorded_audio or uploaded_audio
+        if "Voice" in input_mode and audio_source is not None:
+            st.info("Transcribing voice input...")
+            mime_type: str = audio_source.type or "audio/wav"
             pre_captured_transcript = orchestrator.voice_handler.transcribe_audio_bytes(
-                uploaded_audio.getvalue(),
+                audio_source.getvalue(),
                 mime_type=mime_type
             )
             st.info(f"Speech Transcribed: \"{pre_captured_transcript}\"")
